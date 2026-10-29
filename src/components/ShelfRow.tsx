@@ -38,7 +38,7 @@ export function ShelfRow({ shelf, books, openId, onOpen }: Props) {
         {shelf.name}
         <span className="text-sm font-normal tabular-nums text-stone-600">{books.length}</span>
       </h2>
-      <div className="grid gap-3 sm:grid-cols-[1fr_13rem]">
+      <div className={`grid gap-3 ${active ? "sm:grid-cols-[1fr_13rem]" : ""}`}>
         <div className="relative overflow-hidden rounded-md bg-[linear-gradient(180deg,#3b2414,#5a3720_70%,#4a2c18)] shadow-[inset_0_10px_24px_rgba(0,0,0,0.55)]">
           {books.length === 0 ? (
             <p className="flex h-52 items-end p-4 text-sm text-amber-50">Nothing here yet.</p>
