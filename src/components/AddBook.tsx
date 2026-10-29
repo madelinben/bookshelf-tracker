@@ -1,6 +1,6 @@
 import { Camera, ImagePlus, PenLine, Plus, Search } from "lucide-react";
 import { useState } from "react";
-import { type BookDraft, coverFromFile, searchBooks, type Shelf } from "../lib/books";
+import { type BookDraft, coverFromFile, type Shelf, searchBooks } from "../lib/books";
 import { Cover } from "./Cover";
 import { canScan, Scanner } from "./Scanner";
 import { field, ghost, primary } from "./ui";
@@ -18,7 +18,12 @@ export function AddBook({ shelves, onAdd }: Props) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<BookDraft[]>([]);
   const [status, setStatus] = useState("");
-  const [manual, setManual] = useState<BookDraft>({ title: "", author: "", isbn: null, coverUrl: null });
+  const [manual, setManual] = useState<BookDraft>({
+    title: "",
+    author: "",
+    isbn: null,
+    coverUrl: null,
+  });
 
   async function search(q: string) {
     if (!q.trim()) return;
@@ -26,7 +31,11 @@ export function AddBook({ shelves, onAdd }: Props) {
     try {
       const found = await searchBooks(q.trim());
       setResults(found);
-      setStatus(found.length ? `${found.length} results` : "No matches. Try another spelling or add it yourself.");
+      setStatus(
+        found.length
+          ? `${found.length} results`
+          : "No matches. Try another spelling or add it yourself."
+      );
     } catch {
       setStatus("Search is unavailable right now. Add the book yourself instead.");
     }
@@ -44,7 +53,10 @@ export function AddBook({ shelves, onAdd }: Props) {
   ] as const;
 
   return (
-    <section aria-labelledby="add-h" className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-1 ring-stone-200">
+    <section
+      aria-labelledby="add-h"
+      className="flex flex-col gap-3 rounded-2xl bg-white p-4 ring-1 ring-stone-200"
+    >
       <h2 id="add-h" className="text-lg font-extrabold">
         Add a book
       </h2>
@@ -84,7 +96,13 @@ export function AddBook({ shelves, onAdd }: Props) {
           <label htmlFor="book-q" className="sr-only">
             Title, author or ISBN
           </label>
-          <input id="book-q" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Title, author or ISBN" className={`${field} flex-1`} />
+          <input
+            id="book-q"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Title, author or ISBN"
+            className={`${field} flex-1`}
+          />
           <button type="submit" className={primary}>
             <Search size={16} aria-hidden="true" />
             Search
@@ -107,14 +125,22 @@ export function AddBook({ shelves, onAdd }: Props) {
           onSubmit={(e) => {
             e.preventDefault();
             if (!manual.title.trim()) return;
-            add({ ...manual, title: manual.title.trim().slice(0, 120), author: manual.author.trim().slice(0, 80) });
+            add({
+              ...manual,
+              title: manual.title.trim().slice(0, 120),
+              author: manual.author.trim().slice(0, 80),
+            });
             setManual({ title: "", author: "", isbn: null, coverUrl: null });
           }}
           className="grid gap-3 sm:grid-cols-[6rem_1fr]"
         >
           <label className="flex cursor-pointer flex-col items-center gap-1 text-xs font-semibold text-stone-700 has-focus-visible:outline-2 has-focus-visible:outline-amber-800">
             {manual.coverUrl ? (
-              <img src={manual.coverUrl} alt="Chosen cover" className="h-36 w-24 rounded-md object-cover" />
+              <img
+                src={manual.coverUrl}
+                alt="Chosen cover"
+                className="h-36 w-24 rounded-md object-cover"
+              />
             ) : (
               <span className="grid h-36 w-24 place-items-center rounded-md border-2 border-dashed border-stone-300">
                 <ImagePlus size={22} aria-hidden="true" />
@@ -134,11 +160,20 @@ export function AddBook({ shelves, onAdd }: Props) {
           <div className="flex flex-col gap-2">
             <label className="flex flex-col gap-1 text-sm font-semibold">
               Title
-              <input value={manual.title} onChange={(e) => setManual({ ...manual, title: e.target.value })} className={field} required />
+              <input
+                value={manual.title}
+                onChange={(e) => setManual({ ...manual, title: e.target.value })}
+                className={field}
+                required
+              />
             </label>
             <label className="flex flex-col gap-1 text-sm font-semibold">
               Author
-              <input value={manual.author} onChange={(e) => setManual({ ...manual, author: e.target.value })} className={field} />
+              <input
+                value={manual.author}
+                onChange={(e) => setManual({ ...manual, author: e.target.value })}
+                className={field}
+              />
             </label>
             <button type="submit" className={primary}>
               <Plus size={16} aria-hidden="true" />
@@ -154,11 +189,19 @@ export function AddBook({ shelves, onAdd }: Props) {
       {mode === "search" && results.length > 0 && (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {results.map((r) => (
-            <li key={`${r.title}-${r.isbn}`} className="flex flex-col gap-2 rounded-xl p-2 ring-1 ring-stone-200">
+            <li
+              key={`${r.title}-${r.isbn}`}
+              className="flex flex-col gap-2 rounded-xl p-2 ring-1 ring-stone-200"
+            >
               <Cover title={r.title} url={r.coverUrl} className="mx-auto h-32 w-20 rounded" />
               <p className="line-clamp-2 text-sm font-bold">{r.title}</p>
               <p className="line-clamp-1 text-xs text-stone-700">{r.author}</p>
-              <button type="button" onClick={() => add(r)} className={`${ghost} mt-auto`} aria-label={`Add ${r.title}`}>
+              <button
+                type="button"
+                onClick={() => add(r)}
+                className={`${ghost} mt-auto`}
+                aria-label={`Add ${r.title}`}
+              >
                 <Plus size={14} aria-hidden="true" />
                 Add
               </button>
@@ -168,7 +211,12 @@ export function AddBook({ shelves, onAdd }: Props) {
       )}
       <p className="text-xs text-stone-600">
         Book data and covers from{" "}
-        <a href="https://openlibrary.org" target="_blank" rel="noopener noreferrer" className="underline">
+        <a
+          href="https://openlibrary.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
           Open Library<span className="sr-only"> (opens in a new tab)</span>
         </a>
         .

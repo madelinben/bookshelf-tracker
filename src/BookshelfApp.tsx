@@ -58,7 +58,12 @@ export function BookshelfApp({ beforeExport }: { beforeExport?: BeforeExport }) 
           <p className="text-sm tabular-nums text-stone-700">
             {data.books.length} books · {data.books.filter((b) => b.rating).length} rated
           </p>
-          <button type="button" onClick={() => setAdding(!adding)} aria-expanded={adding} className={ghost}>
+          <button
+            type="button"
+            onClick={() => setAdding(!adding)}
+            aria-expanded={adding}
+            className={ghost}
+          >
             {adding ? <X size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
             {adding ? "Done adding" : "Add a book"}
           </button>
@@ -70,7 +75,17 @@ export function BookshelfApp({ beforeExport }: { beforeExport?: BeforeExport }) 
             onAdd={(draft, shelfId) =>
               update({
                 ...data,
-                books: [...data.books, { ...draft, id: crypto.randomUUID(), shelfId, rating: 0, review: "", addedAt: new Date().toISOString() }],
+                books: [
+                  ...data.books,
+                  {
+                    ...draft,
+                    id: crypto.randomUUID(),
+                    shelfId,
+                    rating: 0,
+                    review: "",
+                    addedAt: new Date().toISOString(),
+                  },
+                ],
               })
             }
           />
@@ -78,7 +93,11 @@ export function BookshelfApp({ beforeExport }: { beforeExport?: BeforeExport }) 
 
         {data.shelves.map((s) => (
           <div key={s.id} className="group relative">
-            <ShelfRow shelf={s} books={data.books.filter((b) => b.shelfId === s.id)} onOpen={(b) => setOpenId(b.id)} />
+            <ShelfRow
+              shelf={s}
+              books={data.books.filter((b) => b.shelfId === s.id)}
+              onOpen={(b) => setOpenId(b.id)}
+            />
             {data.shelves.length > 1 && (
               <button
                 type="button"
@@ -96,14 +115,26 @@ export function BookshelfApp({ beforeExport }: { beforeExport?: BeforeExport }) 
           <label htmlFor="new-shelf" className="sr-only">
             New shelf name
           </label>
-          <input id="new-shelf" value={shelfName} onChange={(e) => setShelfName(e.target.value)} placeholder="New shelf: Holiday reads, Sci-fi…" className={`${field} flex-1`} />
+          <input
+            id="new-shelf"
+            value={shelfName}
+            onChange={(e) => setShelfName(e.target.value)}
+            placeholder="New shelf: Holiday reads, Sci-fi…"
+            className={`${field} flex-1`}
+          />
           <button type="submit" className={ghost}>
             <Plus size={16} aria-hidden="true" />
             Add shelf
           </button>
         </form>
 
-        <DataBackup filename="bookshelf-tracker.json" data={data} parse={parseBookshelf} onRestore={update} beforeExport={beforeExport} />
+        <DataBackup
+          filename="bookshelf-tracker.json"
+          data={data}
+          parse={parseBookshelf}
+          onRestore={update}
+          beforeExport={beforeExport}
+        />
       </div>
 
       {open && (
@@ -111,7 +142,9 @@ export function BookshelfApp({ beforeExport }: { beforeExport?: BeforeExport }) 
           key={open.id}
           book={open}
           shelves={data.shelves}
-          onChange={(b) => update({ ...data, books: data.books.map((x) => (x.id === b.id ? b : x)) })}
+          onChange={(b) =>
+            update({ ...data, books: data.books.map((x) => (x.id === b.id ? b : x)) })
+          }
           onDelete={() => {
             update({ ...data, books: data.books.filter((x) => x.id !== open.id) });
             setOpenId(null);

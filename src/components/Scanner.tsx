@@ -10,7 +10,8 @@ declare global {
   }
 }
 
-export const canScan = () => typeof window !== "undefined" && !!window.BarcodeDetector && !!navigator.mediaDevices;
+export const canScan = () =>
+  typeof window !== "undefined" && !!window.BarcodeDetector && !!navigator.mediaDevices;
 
 /** Camera barcode reader using the browser's native BarcodeDetector. Calls onIsbn once. */
 export function Scanner({ onIsbn }: { onIsbn: (isbn: string) => void }) {
@@ -47,8 +48,12 @@ export function Scanner({ onIsbn }: { onIsbn: (isbn: string) => void }) {
 
   return (
     <div className="flex flex-col gap-2">
-      {/* biome-ignore lint/a11y/useMediaCaption: live camera preview, no audio */}
-      <video ref={video} muted playsInline className="aspect-video w-full rounded-xl bg-stone-900 object-cover" />
+      <video
+        ref={video}
+        muted
+        playsInline
+        className="aspect-video w-full rounded-xl bg-stone-900 object-cover"
+      />
       <p role="status" className="text-sm text-stone-700">
         {error || "Point the camera at the barcode on the back cover."}
       </p>

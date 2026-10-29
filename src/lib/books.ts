@@ -37,7 +37,20 @@ export const EMPTY: BookshelfData = {
 export type BookDraft = Pick<Book, "title" | "author" | "isbn" | "coverUrl">;
 
 // Deep spine colours: white title text passes WCAG AA contrast on every one
-const SPINES = ["#7f1d1d", "#9a3412", "#854d0e", "#3f6212", "#14532d", "#115e59", "#164e63", "#1e3a8a", "#3730a3", "#581c87", "#831843", "#44403c"];
+const SPINES = [
+  "#7f1d1d",
+  "#9a3412",
+  "#854d0e",
+  "#3f6212",
+  "#14532d",
+  "#115e59",
+  "#164e63",
+  "#1e3a8a",
+  "#3730a3",
+  "#581c87",
+  "#831843",
+  "#44403c",
+];
 
 function hash(text: string): number {
   let h = 0;
@@ -96,7 +109,10 @@ export function toDraft(d: OpenLibraryDoc, isbn?: string): BookDraft {
 export async function searchBooks(query: string, signal?: AbortSignal): Promise<BookDraft[]> {
   const isbn = normaliseIsbn(query);
   const params = isbn ? `isbn=${isbn}` : `q=${encodeURIComponent(query)}`;
-  const res = await fetch(`https://openlibrary.org/search.json?${params}&limit=12&fields=${FIELDS}`, { signal });
+  const res = await fetch(
+    `https://openlibrary.org/search.json?${params}&limit=12&fields=${FIELDS}`,
+    { signal }
+  );
   if (!res.ok) throw new Error(`Open Library ${res.status}`);
   const body: { docs?: OpenLibraryDoc[] } = await res.json();
   return (body.docs ?? []).map((d) => toDraft(d, isbn ?? undefined));
@@ -116,7 +132,10 @@ export async function coverFromFile(file: File): Promise<string> {
 export function parseBookshelf(raw: unknown): BookshelfData | null {
   if (typeof raw !== "object" || raw === null) return null;
   const d = raw as Partial<BookshelfData>;
-  return d.version === 1 && Array.isArray(d.shelves) && d.shelves.length > 0 && Array.isArray(d.books)
+  return d.version === 1 &&
+    Array.isArray(d.shelves) &&
+    d.shelves.length > 0 &&
+    Array.isArray(d.books)
     ? { version: 1, shelves: d.shelves, books: d.books }
     : null;
 }

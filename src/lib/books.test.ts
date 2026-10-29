@@ -21,6 +21,9 @@ test("toDraft prefers the cover id, then the ISBN cover", () => {
     toDraft({ title: "A", cover_i: 42 }).coverUrl,
     "https://covers.openlibrary.org/b/id/42-M.jpg"
   );
-  assert.equal(toDraft({ title: "B", isbn: ["0306406152", "9780306406157"] }).isbn, "9780306406157");
+  assert.equal(
+    toDraft({ title: "B", isbn: ["0306406152", "9780306406157"] }).isbn,
+    "9780306406157"
+  );
   assert.equal(toDraft({ title: "C" }).coverUrl, null);
 });

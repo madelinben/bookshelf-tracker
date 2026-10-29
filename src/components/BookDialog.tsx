@@ -34,7 +34,11 @@ export function BookDialog({ book, shelves, onChange, onDelete, onClose }: Props
           </h2>
           {book.author && <p className="text-stone-700">{book.author}</p>}
           {book.isbn && <p className="text-xs tabular-nums text-stone-600">ISBN {book.isbn}</p>}
-          <Stars value={book.rating} label="Your rating" onChange={(rating) => onChange({ ...book, rating })} />
+          <Stars
+            value={book.rating}
+            label="Your rating"
+            onChange={(rating) => onChange({ ...book, rating })}
+          />
         </div>
         <button
           type="button"
@@ -59,7 +63,11 @@ export function BookDialog({ book, shelves, onChange, onDelete, onClose }: Props
         <div className="flex flex-wrap items-end justify-between gap-2">
           <label className="flex flex-col gap-1 text-sm font-semibold">
             Shelf
-            <select value={book.shelfId} onChange={(e) => onChange({ ...book, shelfId: e.target.value })} className={field}>
+            <select
+              value={book.shelfId}
+              onChange={(e) => onChange({ ...book, shelfId: e.target.value })}
+              className={field}
+            >
               {shelves.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
