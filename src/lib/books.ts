@@ -1,3 +1,5 @@
+import type { Spine } from "./spine.ts";
+
 export interface Shelf {
   id: string;
   name: string;
@@ -15,6 +17,8 @@ export interface Book {
   rating: number;
   review: string;
   addedAt: string;
+  /** Colours read from the cover; null when it couldn't be read, missing until tried */
+  spine?: Spine | null;
 }
 
 export interface BookshelfData {

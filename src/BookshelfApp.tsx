@@ -6,6 +6,7 @@ import { DataBackup } from "./components/DataBackup";
 import { ShelfRow } from "./components/ShelfRow";
 import { field, ghost } from "./components/ui";
 import { type BookshelfData, EMPTY, parseBookshelf } from "./lib/books";
+import { spineFromCover } from "./lib/spine";
 import { type BeforeExport, load, save } from "./lib/storage";
 
 const KEY = "bookshelf-tracker";
@@ -30,6 +31,30 @@ export function BookshelfApp({ beforeExport }: { beforeExport?: BeforeExport }) 
     save(KEY, next);
   };
   const open = data.books.find((b) => b.id === openId) ?? null;
+
+  // Spine colours come from the cover images (an external, async read): one book at a time,
+  // each result saved so it's never read twice.
+  const unread = data.books.find((b) => b.coverUrl && b.spine === undefined);
+  const unreadId = unread?.id;
+  const unreadUrl = unread?.coverUrl;
+  useEffect(() => {
+    if (!unreadId || !unreadUrl) return;
+    let live = true;
+    spineFromCover(unreadUrl).then((spine) => {
+      if (!live) return;
+      setData((d) => {
+        const next = {
+          ...d,
+          books: d.books.map((b) => (b.id === unreadId ? { ...b, spine } : b)),
+        };
+        save(KEY, next);
+        return next;
+      });
+    });
+    return () => {
+      live = false;
+    };
+  }, [unreadId, unreadUrl]);
 
   function addShelf(e: React.FormEvent) {
     e.preventDefault();
@@ -96,6 +121,7 @@ export function BookshelfApp({ beforeExport }: { beforeExport?: BeforeExport }) 
             <ShelfRow
               shelf={s}
               books={data.books.filter((b) => b.shelfId === s.id)}
+              openId={openId}
               onOpen={(b) => setOpenId(b.id)}
             />
             {data.shelves.length > 1 && (

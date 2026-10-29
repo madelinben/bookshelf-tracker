@@ -1,17 +1,31 @@
 import { useState } from "react";
-import { type Book, type Shelf, spineStyle } from "../lib/books";
+import { flushSync } from "react-dom";
+import type { Book, Shelf } from "../lib/books";
+import { Book3D } from "./Book3D";
 import { Cover } from "./Cover";
 import { Stars } from "./Stars";
 
 interface Props {
   shelf: Shelf;
   books: Book[];
+  /** The book whose dialog is open: stays turned cover-out until it closes */
+  openId: string | null;
   onOpen: (book: Book) => void;
 }
 
 /** One wooden shelf of spines. Hover or focus pulls a book out and shows its cover on the right. */
-export function ShelfRow({ shelf, books, onOpen }: Props) {
+export function ShelfRow({ shelf, books, openId, onOpen }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [turning, setTurning] = useState<string | null>(null);
+
+  // Turn the book cover-out, wait for the turn to finish, then open its dialog.
+  async function pick(book: Book, el: HTMLElement) {
+    flushSync(() => setTurning(book.id));
+    await Promise.allSettled(el.getAnimations().map((a) => a.finished));
+    onOpen(book);
+    setTurning(null);
+  }
+
   const active = books.find((b) => b.id === activeId) ?? books[0] ?? null;
   const headingId = `shelf-${shelf.id}`;
 
@@ -25,48 +39,28 @@ export function ShelfRow({ shelf, books, onOpen }: Props) {
         <span className="text-sm font-normal tabular-nums text-stone-600">{books.length}</span>
       </h2>
       <div className="grid gap-3 sm:grid-cols-[1fr_13rem]">
-        <div className="rounded-b-md border-b-[14px] border-amber-900 bg-gradient-to-b from-amber-50 to-amber-100/70 shadow-[inset_0_-6px_8px_-6px_rgba(0,0,0,0.25)]">
+        <div className="relative overflow-hidden rounded-md bg-[linear-gradient(180deg,#3b2414,#5a3720_70%,#4a2c18)] shadow-[inset_0_10px_24px_rgba(0,0,0,0.55)]">
           {books.length === 0 ? (
-            <p className="flex h-48 items-end p-4 text-sm text-stone-600">Nothing here yet.</p>
+            <p className="flex h-52 items-end p-4 text-sm text-amber-50">Nothing here yet.</p>
           ) : (
-            <ul className="flex h-56 items-end gap-1 overflow-x-auto px-3 pt-6">
-              {books.map((b) => {
-                const s = spineStyle(b.title);
-                const isActive = active?.id === b.id;
-                return (
-                  <li key={b.id} className="shrink-0">
-                    <button
-                      type="button"
-                      onMouseEnter={() => setActiveId(b.id)}
-                      onFocus={() => setActiveId(b.id)}
-                      onClick={() => onOpen(b)}
-                      aria-label={`${b.title}${b.author ? ` by ${b.author}` : ""}. Open details`}
-                      style={{
-                        backgroundColor: s.colour,
-                        height: `${s.heightRem}rem`,
-                        width: `${s.widthRem}rem`,
-                      }}
-                      className={`relative flex items-center justify-center overflow-hidden rounded-t-sm border-x border-black/20 text-white shadow-[inset_3px_0_4px_rgba(255,255,255,0.15),inset_-3px_0_4px_rgba(0,0,0,0.25)] transition-transform duration-300 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800 motion-reduce:transition-none ${
-                        isActive ? "-translate-y-5 rotate-[-2deg]" : "hover:-translate-y-3"
-                      }`}
-                    >
-                      <span
-                        className="absolute inset-x-0 top-2 h-0.5 bg-amber-300/70"
-                        aria-hidden="true"
-                      />
-                      <span className="max-h-[85%] truncate text-xs font-bold tracking-wide [writing-mode:vertical-rl] rotate-180">
-                        {b.title}
-                      </span>
-                      <span
-                        className="absolute inset-x-0 bottom-2 h-0.5 bg-amber-300/70"
-                        aria-hidden="true"
-                      />
-                    </button>
-                  </li>
-                );
-              })}
+            <ul className="flex h-60 items-end gap-0.5 overflow-x-auto px-4 pt-10 [scrollbar-width:thin]">
+              {books.map((b) => (
+                <Book3D
+                  key={b.id}
+                  book={b}
+                  open={turning === b.id || openId === b.id}
+                  onPick={(el) => pick(b, el)}
+                  onFocus={() => setActiveId(b.id)}
+                />
+              ))}
             </ul>
           )}
+          {/* Shelf board: top face and front lip */}
+          <div
+            aria-hidden="true"
+            className="h-3 bg-[linear-gradient(180deg,#a0703f,#7a4f2a)] shadow-[0_-6px_10px_rgba(0,0,0,0.35)]"
+          />
+          <div aria-hidden="true" className="h-3 bg-[linear-gradient(180deg,#6b4423,#3f2614)]" />
         </div>
         {active && (
           <aside

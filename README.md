@@ -5,7 +5,9 @@ Your books on visual shelves: search, scan or add your own, then rate and review
 - Search Open Library by title, author or ISBN (free, no key)
 - Scan the barcode with your camera (browsers with the native BarcodeDetector, e.g. Chrome on Android)
 - Add any book yourself with a photo of the cover (shrunk to fit browser storage)
-- Custom shelves with coloured spines; hover or focus pulls a book out and shows its cover, rating and review
+- 3D shelves (pure CSS): every book is a box with spine, cover and page block. Hover or focus slides it out and turns it to show the cover; click turns it cover-out and it opens as a book, cover swinging back on its hinge to the review page
+- Spine colours read from the cover with [node-vibrant](https://github.com/Vibrant-Colors/node-vibrant) (most common colour, contrasting band, black or white title that always passes WCAG AA); books without a cover get a stable colour from the title
+- Respects reduced motion: no animation, same states
 - Star rating and review per book, move between shelves
 - Data stays in the browser (localStorage). Download a backup file and restore it on any device.
 
